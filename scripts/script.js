@@ -1,26 +1,44 @@
+import { TodoItem } from './todoItem.js'
+
 let todoList = [
     {id: 1, message: 'Прочитать инструкцию!', done: false, start: 'start', end: 'end'},
     {id: 2, message: 'Создать тудушку!', done: false, start: 'start', end: 'end'},
     {id: 3, message: 'Добавить функционал', done: false, start: 'start', end: 'end'},
 ]
 
-let div = document.getElementById('todoList')
-
-function createTodoList(arr) {
-    if (!arr.length) return
-    let ul = document.createElement('ul')
-
-    for (let i=0; i < arr.length; i++) {
-        let message = arr[i].message
-        let ind = arr[i].id
-
-        let li = document.createElement('li')
-        li.innerHTML = `<span class="ind">${ind}.</span> ${message}`
-        let span = li.querySelector('.ind')
-        span.style.fontWeight = 'bold'
-
-        ul.append(li)
+class TodoList {
+    constructor(arr) {
+        this.arr = arr
     }
-    div.append(ul)
+
+    createTodo()  {
+        const div = document.getElementById('todoList')
+        const ul = document.createElement('ul')
+
+        for (let i = 0; i < this.arr.length; i++) {
+            const todo = new TodoItem(this.arr[i]).showTodo()
+            ul.append(todo)
+        }
+
+        div.append(ul)
+    }
 }
-createTodoList(todoList)
+
+const myTodo = new TodoList(todoList)
+myTodo.createTodo()
+
+
+
+
+// function createTodo(arr)  {
+//     const div = document.getElementById('todoList')
+//     const ul = document.createElement('ul')
+//
+//     for (let i = 0; i < arr.length; i++) {
+//         const todo = new TodoItem(arr[i]).showTodo()
+//         ul.append(todo)
+//     }
+//
+//     div.append(ul)
+// }
+// createTodo(todoList)
