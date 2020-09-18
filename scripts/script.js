@@ -1,26 +1,279 @@
+import { TodoItem } from './todoItem.js'
+
 let todoList = [
-    {id: 1, message: 'Прочитать инструкцию!', done: false, start: 'start', end: 'end'},
-    {id: 2, message: 'Создать тудушку!', done: false, start: 'start', end: 'end'},
-    {id: 3, message: 'Добавить функционал', done: false, start: 'start', end: 'end'},
+    {id: '', message: 'Прочитать инструкцию!', start: new Date().toLocaleDateString(), end: new Date(new Date().setDate(new Date().getDate()+1)).toLocaleDateString()},
+    {id: '', message: 'Создать тудушку!', start: new Date().toLocaleDateString(), end: new Date(new Date().setDate(new Date().getDate()+1)).toLocaleDateString()},
+    {id: '', message: 'Добавить функционал', start: new Date().toLocaleDateString(), end: new Date(new Date().setDate(new Date().getDate()+1)).toLocaleDateString()},
 ]
 
-let div = document.getElementById('todoList')
-
-function createTodoList(arr) {
-    if (!arr.length) return
-    let ul = document.createElement('ul')
-
-    for (let i=0; i < arr.length; i++) {
-        let message = arr[i].message
-        let ind = arr[i].id
-
-        let li = document.createElement('li')
-        li.innerHTML = `<span class="ind">${ind}.</span> ${message}`
-        let span = li.querySelector('.ind')
-        span.style.fontWeight = 'bold'
-
-        ul.append(li)
+class TodoList {
+    constructor(arr) {
+        this.arr = arr
     }
-    div.append(ul)
+
+    insertTodoNumber(todo, num) {
+        let todoNumber =  todo.querySelector('.todoNumber')
+        todoNumber.innerHTML = num
+        return todoNumber
+    }
+
+    createTodo()  {
+        const div = document.getElementById('todoList')
+        const ul = document.createElement('ul')
+        // let todoNumber = div.querySelectorAll('.todoNumber')
+        // todoNumber = Array.from(todoNumber)
+
+        for (let i = 0; i < this.arr.length; i++) {
+            const todo = new TodoItem(this.arr[i]).showTodo()
+            // let todoNum = `  ${i+1}.  `
+            // todo.firstElementChild.firstElementChild.after(todoNum)
+            this.insertTodoNumber(todo, i+1)
+            ul.append(todo)
+        }
+
+        div.append(ul)
+    }
+    addTodo() {
+        const myThis = this
+        const inp = document.getElementById('newTodoInput')
+
+        inp.addEventListener('keyup', function (e) {
+            this.classList.remove('invalid')
+            const text = this.value
+            if (text.match(/^(?=.*[!@#$%^&(),.+=/\]\[{}?><":;|])/)) {
+                this.classList.toggle('invalid')
+                return
+            }
+
+            if (e.key === 'Enter' && text) {
+                const start = new Date().toLocaleDateString()
+                const end = new Date(new Date().setDate(new Date().getDate()+1)).toLocaleDateString()
+                const todoItemCount = document.querySelectorAll('li')
+
+                let newTodo = { message: text, start, end }
+                const todoLi = new TodoItem(newTodo).showTodo()
+                myThis.arr.push(newTodo)
+
+                myThis.insertTodoNumber(todoLi, todoItemCount.length + 1)
+
+                const ul = document.querySelector('ul')
+                ul.append(todoLi)
+                inp.value = ''
+            }
+        })
+    }
+
+    closeModal() {
+        const modal = document.querySelector('.modal')
+        const btnCancel = document.querySelector('.modalCancel')
+        const btnSave = document.querySelector('.modalSave')
+
+        btnCancel.addEventListener('click', function () {
+            modal.classList.toggle('hide')
+        })
+        btnSave.addEventListener('click', function() {
+            modal.classList.toggle('hide')
+        })
+    }
+    openModal() {
+        const openButton = document.querySelector('.plus').firstElementChild
+        const modal = document.querySelector('.modal')
+        openButton.addEventListener('click', e => {
+            modal.classList.remove('hide')
+        })
+    }
+    addTodoFromModal() {
+        const myThis = this
+        const inpMessage = document.getElementById('modalTodoInput')
+        const inpStart = document.getElementById('start')
+        const inpEnd = document.getElementById('end')
+        const saveButton = document.querySelector('.modalSave')
+        let start = inpStart.value.split('-').reverse().join('.')
+        let end = inpStart.value.split('-').reverse().join('.')
+        let message = ''
+        const newTodo = {start, end, message, done: false}
+        let validMessage = false
+        let validDate = true
+        saveButton.setAttribute('disabled', 'disabled')
+
+        function showErr() {
+            let err = document.createElement('div')
+            err.classList.add('errDiv')
+            return err
+        }
+
+        function compareDates() {
+            if (new Date(inpStart.value).getTime() > new Date(inpEnd.value).getTime()) {
+                const errDiv = showErr()
+                errDiv.innerHTML = 'Wrong time intervals'
+                errDiv.classList.add('timeErr')
+                return errDiv
+            }
+        }
+
+        function showSaveButton(validMessage, validDate) {
+            if (validMessage && validDate) {
+                saveButton.classList.remove('modalSave')
+                saveButton.removeAttribute('disabled')
+            } else {
+                saveButton.classList.add('modalSave')
+                saveButton.setAttribute('disabled', 'disabled')
+            }
+        }
+        showSaveButton(validMessage, validDate)
+
+        inpMessage.addEventListener('input', function (e) {
+            let invalidInput = (/^(?=.*[!@#$%^&(),.+=/\]\[{}?><":;|])/).test(this.value)
+
+            if (invalidInput || !this.value) {
+                this.classList.add('invalid')
+                const errDiv = showErr()
+                errDiv.innerHTML = 'Wrong symbol or empty field'
+
+                if (this.nextElementSibling === null) this.after(errDiv)
+                validMessage = false
+                showSaveButton(validMessage, validDate)
+                return this
+            }
+            if (!this.value) return
+            if (!invalidInput && this.value) {
+                let errDiv = this.nextElementSibling
+                if (errDiv) errDiv.remove()
+                this.classList.remove('invalid')
+                validMessage = true
+                showSaveButton(validMessage, validDate)
+                newTodo.message = this.value
+            }
+        })
+
+        inpStart.addEventListener('change', function (e) {
+            start = this.value.split('-').reverse().join('.')
+            const errParentPosition = this.parentElement
+
+            const errDiv = compareDates()
+            const prevErr = errParentPosition.lastElementChild.classList.contains('errDiv')
+
+            if (errDiv || prevErr) {
+                validDate = false
+                showSaveButton(validMessage, validDate)
+            }
+            if (errDiv && prevErr) return this
+            if (prevErr) {
+                errParentPosition.lastChild.remove()
+                validDate = (new Date(inpStart.value).getTime() < new Date(inpEnd.value).getTime())
+                showSaveButton(validMessage, validDate)
+                return this
+            }
+            if (errDiv && !prevErr) {
+                errParentPosition.append(errDiv)
+                return this
+            }
+            if (!errDiv && !prevErr) {
+                let errDiv = this.parentElement.lastElementChild
+                if (errDiv.classList.contains('errDiv')) errDiv.remove()
+
+                validDate = true
+                showSaveButton(validMessage, validDate)
+                newTodo.start = start
+            }
+
+            return validDate
+        })
+
+        inpEnd.addEventListener('change', function (e) {
+            end = this.value.split('-').reverse().join('.')
+            const errParentPosition = this.parentElement.previousElementSibling
+
+            let errDiv = compareDates()
+            const prevErr = this.parentElement.previousElementSibling.lastElementChild.classList.contains('errDiv')
+
+            if (errDiv || prevErr) {
+                validDate = false
+                showSaveButton(validMessage, validDate)
+            }
+            if (!errDiv && !prevErr) {
+                let errDiv = this.parentElement.previousElementSibling.lastElementChild
+                if (errDiv.classList.contains('errDiv')) errDiv.remove()
+                newTodo.end = end
+                validDate = true
+                showSaveButton(validMessage, validDate)
+                return this
+            }
+            if (errDiv && prevErr)  return this
+            if (prevErr) {
+                errParentPosition.lastChild.remove()
+
+                validDate = (new Date(inpStart.value).getTime() < new Date(inpEnd.value).getTime())
+                newTodo.start = inpStart.value.split('-').reverse().join('.')
+                newTodo.end = end
+                showSaveButton(validMessage, validDate)
+                return this
+            }
+            if (errDiv && !prevErr) {
+                errParentPosition.append(errDiv)
+                return this
+            }
+        })
+
+        saveButton.addEventListener('click', function (e) {
+            const modal = document.querySelector('.modal')
+            const todoLi = new TodoItem(newTodo).showTodo()
+            const todoItemCount = document.querySelectorAll('li')
+
+            myThis.arr.push(newTodo)
+
+            myThis.insertTodoNumber(todoLi, todoItemCount.length + 1)
+
+            const ul = document.querySelector('ul')
+            ul.append(todoLi)
+
+            inpMessage.value = ''
+            validMessage = false
+            showSaveButton(validMessage, validDate)
+
+            modal.classList.add('hide')
+            console.log()
+        })
+    }
+    checkTodo() {
+        const todoList = document.getElementById('todoList')
+        todoList.addEventListener('click', function (e) {
+            e.stopPropagation()
+            const input = e.target
+            const parentTodo = input.parentElement.parentElement
+
+            if (input.tagName !== 'INPUT') return
+            if (input.checked) {
+                parentTodo.classList.add('checked')
+            } else parentTodo.classList.remove('checked')
+        })
+    }
+    deleteTodo() {
+        const myThis = this
+        const todoListField = document.getElementById('todoList')
+        todoListField.addEventListener('click', function (e) {
+            e.stopPropagation()
+            const target = e.target
+            const parentLi = target.closest('li')
+
+            if (target.tagName === 'SPAN' && target.classList.contains('delete')) {
+                parentLi.remove()
+                const siblingLi = todoListField.querySelectorAll('li')
+                const siblingLiArr = Array.from(siblingLi)
+                siblingLiArr.map((todo, ind) => myThis.insertTodoNumber(todo, ind+1))}
+
+        })
+    }
 }
-createTodoList(todoList)
+
+const myTodo = new TodoList(todoList)
+myTodo.createTodo()
+myTodo.addTodo()
+myTodo.closeModal()
+myTodo.openModal()
+myTodo.addTodoFromModal()
+myTodo.checkTodo()
+myTodo.deleteTodo()
+
+
+
