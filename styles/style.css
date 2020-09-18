@@ -80,14 +80,14 @@ li:last-child {
     flex-direction: column;
 }
 .plus{
-    margin: 14px 0 0 0;
+    margin: 20px 0 0 0;
 }
 .plus button{
-    width: 40px;
-    height: 40px;
-    font-size: 40px;
+    width: 25px;
+    height: 25px;
+    font-size: 25px;
     text-align: center;
-    line-height: 40px;
+    line-height: 25px;
     font-weight: bold;
     border-radius: 50%;
     border: 1px solid black;
@@ -97,12 +97,12 @@ li:last-child {
 }
 #newTodoInput, #modalTodoInput {
     margin: 0 0 15px 10px;
-    padding: 10px;
+    padding: 6px;
     border-radius: 5px;
     min-width: 250px;
 }
 #newTodoInput {
-    margin: 0 25px 25px 5px;
+    margin: 0 0 25px 0;
 }
 #modalTodoInput {
     background: #C1C1C1;
@@ -199,4 +199,7 @@ li:last-child {
 .checked {
     text-decoration: line-through;
     color: lightgray;
+}
+.delete {
+    cursor: pointer;
 }

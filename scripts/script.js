@@ -1,9 +1,9 @@
 import { TodoItem } from './todoItem.js'
 
 let todoList = [
-    {message: 'Прочитать инструкцию!', start: new Date().toLocaleDateString(), end: new Date(new Date().setDate(new Date().getDate()+1)).toLocaleDateString()},
-    {message: 'Создать тудушку!', start: new Date().toLocaleDateString(), end: new Date(new Date().setDate(new Date().getDate()+1)).toLocaleDateString()},
-    {message: 'Добавить функционал', start: new Date().toLocaleDateString(), end: new Date(new Date().setDate(new Date().getDate()+1)).toLocaleDateString()},
+    {id: '', message: 'Прочитать инструкцию!', start: new Date().toLocaleDateString(), end: new Date(new Date().setDate(new Date().getDate()+1)).toLocaleDateString()},
+    {id: '', message: 'Создать тудушку!', start: new Date().toLocaleDateString(), end: new Date(new Date().setDate(new Date().getDate()+1)).toLocaleDateString()},
+    {id: '', message: 'Добавить функционал', start: new Date().toLocaleDateString(), end: new Date(new Date().setDate(new Date().getDate()+1)).toLocaleDateString()},
 ]
 
 class TodoList {
@@ -11,14 +11,23 @@ class TodoList {
         this.arr = arr
     }
 
+    insertTodoNumber(todo, num) {
+        let todoNumber =  todo.querySelector('.todoNumber')
+        todoNumber.innerHTML = num
+        return todoNumber
+    }
+
     createTodo()  {
         const div = document.getElementById('todoList')
         const ul = document.createElement('ul')
+        // let todoNumber = div.querySelectorAll('.todoNumber')
+        // todoNumber = Array.from(todoNumber)
 
         for (let i = 0; i < this.arr.length; i++) {
             const todo = new TodoItem(this.arr[i]).showTodo()
-            let todoNum = `  ${i+1}.  `
-            todo.firstElementChild.firstElementChild.after(todoNum)
+            // let todoNum = `  ${i+1}.  `
+            // todo.firstElementChild.firstElementChild.after(todoNum)
+            this.insertTodoNumber(todo, i+1)
             ul.append(todo)
         }
 
@@ -39,12 +48,13 @@ class TodoList {
             if (e.key === 'Enter' && text) {
                 const start = new Date().toLocaleDateString()
                 const end = new Date(new Date().setDate(new Date().getDate()+1)).toLocaleDateString()
+                const todoItemCount = document.querySelectorAll('li')
 
                 let newTodo = { message: text, start, end }
                 const todoLi = new TodoItem(newTodo).showTodo()
                 myThis.arr.push(newTodo)
-                let todoNum = `  ${myThis.arr.length}.  `
-                todoLi.firstElementChild.firstElementChild.after(todoNum)
+
+                myThis.insertTodoNumber(todoLi, todoItemCount.length + 1)
 
                 const ul = document.querySelector('ul')
                 ul.append(todoLi)
@@ -208,10 +218,11 @@ class TodoList {
         saveButton.addEventListener('click', function (e) {
             const modal = document.querySelector('.modal')
             const todoLi = new TodoItem(newTodo).showTodo()
+            const todoItemCount = document.querySelectorAll('li')
 
             myThis.arr.push(newTodo)
-            let todoNum = `  ${myThis.arr.length}.  `
-            todoLi.firstElementChild.firstElementChild.after(todoNum)
+
+            myThis.insertTodoNumber(todoLi, todoItemCount.length + 1)
 
             const ul = document.querySelector('ul')
             ul.append(todoLi)
@@ -237,6 +248,22 @@ class TodoList {
             } else parentTodo.classList.remove('checked')
         })
     }
+    deleteTodo() {
+        const myThis = this
+        const todoListField = document.getElementById('todoList')
+        todoListField.addEventListener('click', function (e) {
+            e.stopPropagation()
+            const target = e.target
+            const parentLi = target.closest('li')
+
+            if (target.tagName === 'SPAN' && target.classList.contains('delete')) {
+                parentLi.remove()
+                const siblingLi = todoListField.querySelectorAll('li')
+                const siblingLiArr = Array.from(siblingLi)
+                siblingLiArr.map((todo, ind) => myThis.insertTodoNumber(todo, ind+1))}
+
+        })
+    }
 }
 
 const myTodo = new TodoList(todoList)
@@ -246,7 +273,7 @@ myTodo.closeModal()
 myTodo.openModal()
 myTodo.addTodoFromModal()
 myTodo.checkTodo()
-
+myTodo.deleteTodo()
 
 
 

@@ -10,7 +10,9 @@ export class TodoItem {
     }
     showTodo() {
         const li = document.createElement('li')
-        li.innerHTML = `<span><input type="checkbox" id="${this.id}"> <span class="ind">  ${this.message}</span></span><span class="time">начало: ${this.start} конец: ${this.end}</span>`
+        li.innerHTML = `
+            <span><input type="checkbox" id="${this.id}"> <span class="ind"><span class="todoNumber"></span>  ${this.message}</span></span>
+            <span class="time">начало: ${this.start} конец: ${this.end} <span class="delete">\t&#10060;</span></span>`
         let span = li.querySelector('.ind')
         span.style.fontWeight = 'bold'
         return li
