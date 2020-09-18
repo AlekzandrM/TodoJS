@@ -25,22 +25,24 @@ class TodoList {
         div.append(ul)
     }
     addTodo() {
-        let myThis = this
+        const myThis = this
         const inp = document.getElementById('newTodoInput')
 
         inp.addEventListener('keyup', function (e) {
-            let text = this.value
+            this.classList.remove('invalid')
+            const text = this.value
+            if (text.match(/^(?=.*[!@#$%^&(),.+=/\]\[{}?><":;|])/)) {
+                this.classList.toggle('invalid')
+                return
+            }
 
-            if (text.match(/^(?=.*[!@#$%^&(),.+=/\]\[{}?><":;|])/)) return
-
-            if (e.key === 'Enter' ) {
+            if (e.key === 'Enter' && text) {
                 const start = new Date().toLocaleDateString()
                 const end = new Date(new Date().setDate(new Date().getDate()+1)).toLocaleDateString()
 
                 let newTodo = { message: text, start, end }
                 const todoLi = new TodoItem(newTodo).showTodo()
                 myThis.arr.push(newTodo)
-
                 let todoNum = myThis.arr.length + '.'
                 todoLi.firstChild.prepend(todoNum)
 
@@ -79,8 +81,7 @@ class TodoList {
         let start = inpStart.value.split('-').reverse().join('.')
         let end = inpStart.value.split('-').reverse().join('.')
         let message = ''
-        const newTodo = {start, end, message}
-        const restrictedSymbols = ['!', '@', '#','$','%','^','&','*','(',')',]
+        const newTodo = {start, end, message, done: false}
         let validMessage = false
         let validDate = true
         saveButton.setAttribute('disabled', 'disabled')
@@ -112,29 +113,27 @@ class TodoList {
         showSaveButton(validMessage, validDate)
 
         inpMessage.addEventListener('input', function (e) {
-            for (let i = 0; i < restrictedSymbols.length; i++) {
-                let invalidInput = (this.value.split('').includes(restrictedSymbols[i]) || this.value === '')
+            let invalidInput = (/^(?=.*[!@#$%^&(),.+=/\]\[{}?><":;|])/).test(this.value)
 
-                if (invalidInput) {
-                    this.classList.add('invalid')
-                    const errDiv = showErr()
-                    errDiv.innerHTML = 'Wrong symbol or empty field'
+            if (invalidInput || !this.value) {
+                this.classList.add('invalid')
+                const errDiv = showErr()
+                errDiv.innerHTML = 'Wrong symbol or empty field'
 
-                    if (this.nextElementSibling === null) this.after(errDiv)
-                    validMessage = false
-                    showSaveButton(validMessage, validDate)
-                    return this
-                }
-                if (!invalidInput) {
-                    let errDiv = this.nextElementSibling
-                    if (errDiv) errDiv.remove()
-                    this.classList.remove('invalid')
-                    validMessage = true
-                    showSaveButton(validMessage, validDate)
-                }
+                if (this.nextElementSibling === null) this.after(errDiv)
+                validMessage = false
+                showSaveButton(validMessage, validDate)
+                return this
             }
-            newTodo.message = this.value
-            return validMessage
+            if (!this.value) return
+            if (!invalidInput && this.value) {
+                let errDiv = this.nextElementSibling
+                if (errDiv) errDiv.remove()
+                this.classList.remove('invalid')
+                validMessage = true
+                showSaveButton(validMessage, validDate)
+                newTodo.message = this.value
+            }
         })
 
         inpStart.addEventListener('change', function (e) {
@@ -151,6 +150,8 @@ class TodoList {
             if (errDiv && prevErr) return this
             if (prevErr) {
                 errParentPosition.lastChild.remove()
+                validDate = (new Date(inpStart.value).getTime() < new Date(inpEnd.value).getTime())
+                showSaveButton(validMessage, validDate)
                 return this
             }
             if (errDiv && !prevErr) {
@@ -207,6 +208,7 @@ class TodoList {
         saveButton.addEventListener('click', function (e) {
             const modal = document.querySelector('.modal')
             const todoLi = new TodoItem(newTodo).showTodo()
+            console.log(newTodo)
 
             myThis.arr.push(newTodo)
             let todoNum = myThis.arr.length + '.'
@@ -214,9 +216,13 @@ class TodoList {
 
             const ul = document.querySelector('ul')
             ul.append(todoLi)
+
             inpMessage.value = ''
+            validMessage = false
+            showSaveButton(validMessage, validDate)
 
             modal.classList.add('hide')
+            console.log()
         })
     }
 }
