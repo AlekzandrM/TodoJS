@@ -1,9 +1,9 @@
 import { TodoItem } from './todoItem.js'
 
 let todoList = [
-    {id: 1, message: 'Прочитать инструкцию!', done: false, start: new Date().toLocaleDateString(), end: new Date(new Date().setDate(new Date().getDate()+1)).toLocaleDateString()},
-    {id: 2, message: 'Создать тудушку!', done: false, start: new Date().toLocaleDateString(), end: new Date(new Date().setDate(new Date().getDate()+1)).toLocaleDateString()},
-    {id: 3, message: 'Добавить функционал', done: false, start: new Date().toLocaleDateString(), end: new Date(new Date().setDate(new Date().getDate()+1)).toLocaleDateString()},
+    {message: 'Прочитать инструкцию!', start: new Date().toLocaleDateString(), end: new Date(new Date().setDate(new Date().getDate()+1)).toLocaleDateString()},
+    {message: 'Создать тудушку!', start: new Date().toLocaleDateString(), end: new Date(new Date().setDate(new Date().getDate()+1)).toLocaleDateString()},
+    {message: 'Добавить функционал', start: new Date().toLocaleDateString(), end: new Date(new Date().setDate(new Date().getDate()+1)).toLocaleDateString()},
 ]
 
 class TodoList {
@@ -17,8 +17,8 @@ class TodoList {
 
         for (let i = 0; i < this.arr.length; i++) {
             const todo = new TodoItem(this.arr[i]).showTodo()
-            let todoNum = i + 1 + '.'
-            todo.firstChild.prepend(todoNum)
+            let todoNum = `  ${i+1}.  `
+            todo.firstElementChild.firstElementChild.after(todoNum)
             ul.append(todo)
         }
 
@@ -43,8 +43,8 @@ class TodoList {
                 let newTodo = { message: text, start, end }
                 const todoLi = new TodoItem(newTodo).showTodo()
                 myThis.arr.push(newTodo)
-                let todoNum = myThis.arr.length + '.'
-                todoLi.firstChild.prepend(todoNum)
+                let todoNum = `  ${myThis.arr.length}.  `
+                todoLi.firstElementChild.firstElementChild.after(todoNum)
 
                 const ul = document.querySelector('ul')
                 ul.append(todoLi)
@@ -208,11 +208,10 @@ class TodoList {
         saveButton.addEventListener('click', function (e) {
             const modal = document.querySelector('.modal')
             const todoLi = new TodoItem(newTodo).showTodo()
-            console.log(newTodo)
 
             myThis.arr.push(newTodo)
-            let todoNum = myThis.arr.length + '.'
-            todoLi.firstChild.prepend(todoNum)
+            let todoNum = `  ${myThis.arr.length}.  `
+            todoLi.firstElementChild.firstElementChild.after(todoNum)
 
             const ul = document.querySelector('ul')
             ul.append(todoLi)
@@ -225,15 +224,28 @@ class TodoList {
             console.log()
         })
     }
+    checkTodo() {
+        const todoList = document.getElementById('todoList')
+        todoList.addEventListener('click', function (e) {
+            e.stopPropagation()
+            const input = e.target
+            const parentTodo = input.parentElement.parentElement
+
+            if (input.tagName !== 'INPUT') return
+            if (input.checked) {
+                parentTodo.classList.add('checked')
+            } else parentTodo.classList.remove('checked')
+        })
+    }
 }
 
 const myTodo = new TodoList(todoList)
 myTodo.createTodo()
 myTodo.addTodo()
-
 myTodo.closeModal()
 myTodo.openModal()
 myTodo.addTodoFromModal()
+myTodo.checkTodo()
 
 
 

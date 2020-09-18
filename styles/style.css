@@ -195,3 +195,8 @@ li:last-child {
 .modalSave {
     opacity: 0.3;
 }
+
+.checked {
+    text-decoration: line-through;
+    color: lightgray;
+}
