@@ -20,17 +20,12 @@ class TodoList {
     createTodo()  {
         const div = document.getElementById('todoList')
         const ul = document.createElement('ul')
-        // let todoNumber = div.querySelectorAll('.todoNumber')
-        // todoNumber = Array.from(todoNumber)
 
         for (let i = 0; i < this.arr.length; i++) {
             const todo = new TodoItem(this.arr[i]).showTodo()
-            // let todoNum = `  ${i+1}.  `
-            // todo.firstElementChild.firstElementChild.after(todoNum)
             this.insertTodoNumber(todo, i+1)
             ul.append(todo)
         }
-
         div.append(ul)
     }
     addTodo() {
@@ -63,22 +58,32 @@ class TodoList {
         })
     }
 
+    resetModalInputs() {
+        const message = document.querySelector('#modalTodoInput')
+        const start = document.querySelector('#start')
+        const end = document.querySelector('#end')
+        const today = new Date().toLocaleDateString().split('.').reverse().join('-')
+        const tomorrow = new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString().split('.').reverse().join('-')
+
+        start.value = today
+        end.value = tomorrow
+        message.value = ''
+    }
+
     closeModal() {
         const modal = document.querySelector('.modal')
-        const btnCancel = document.querySelector('.modalCancel')
-        const btnSave = document.querySelector('.modalSave')
 
-        btnCancel.addEventListener('click', function () {
-            modal.classList.toggle('hide')
-        })
-        btnSave.addEventListener('click', function() {
-            modal.classList.toggle('hide')
-        })
+        this.resetModalInputs()
+        modal.classList.add('hide')
     }
     openModal() {
+        const myThis = this
         const openButton = document.querySelector('.plus').firstElementChild
         const modal = document.querySelector('.modal')
+
         openButton.addEventListener('click', e => {
+            myThis.resetModalInputs()
+            myThis.addTodoFromModal()
             modal.classList.remove('hide')
         })
     }
@@ -88,6 +93,7 @@ class TodoList {
         const inpStart = document.getElementById('start')
         const inpEnd = document.getElementById('end')
         const saveButton = document.querySelector('.modalSave')
+        const cancelButton = document.querySelector('.modalCancel')
         let start = inpStart.value.split('-').reverse().join('.')
         let end = inpStart.value.split('-').reverse().join('.')
         let message = ''
@@ -95,6 +101,10 @@ class TodoList {
         let validMessage = false
         let validDate = true
         saveButton.setAttribute('disabled', 'disabled')
+
+        cancelButton.addEventListener('click', function (e) {
+            myThis.closeModal()
+        })
 
         function showErr() {
             let err = document.createElement('div')
@@ -176,7 +186,6 @@ class TodoList {
                 showSaveButton(validMessage, validDate)
                 newTodo.start = start
             }
-
             return validDate
         })
 
@@ -216,7 +225,7 @@ class TodoList {
         })
 
         saveButton.addEventListener('click', function (e) {
-            const modal = document.querySelector('.modal')
+            e.stopImmediatePropagation()
             const todoLi = new TodoItem(newTodo).showTodo()
             const todoItemCount = document.querySelectorAll('li')
 
@@ -226,13 +235,9 @@ class TodoList {
 
             const ul = document.querySelector('ul')
             ul.append(todoLi)
-
-            inpMessage.value = ''
+            myThis.closeModal()
             validMessage = false
             showSaveButton(validMessage, validDate)
-
-            modal.classList.add('hide')
-            console.log()
         })
     }
     checkTodo() {
@@ -261,7 +266,6 @@ class TodoList {
                 const siblingLi = todoListField.querySelectorAll('li')
                 const siblingLiArr = Array.from(siblingLi)
                 siblingLiArr.map((todo, ind) => myThis.insertTodoNumber(todo, ind+1))}
-
         })
     }
 }
@@ -269,9 +273,7 @@ class TodoList {
 const myTodo = new TodoList(todoList)
 myTodo.createTodo()
 myTodo.addTodo()
-myTodo.closeModal()
 myTodo.openModal()
-myTodo.addTodoFromModal()
 myTodo.checkTodo()
 myTodo.deleteTodo()
 

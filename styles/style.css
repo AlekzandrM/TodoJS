@@ -200,6 +200,6 @@ li:last-child {
     text-decoration: line-through;
     color: lightgray;
 }
-.delete {
+.delete, .edit {
     cursor: pointer;
 }
