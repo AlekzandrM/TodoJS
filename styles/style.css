@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;700&display=swap');
+/*@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;700&display=swap');*/
 /*$fontfamily: "Montserrat";*/
 /*$minWidth: 320px;*/
 
@@ -9,8 +9,8 @@
 a:focus,a:active{outline: none;}
 aside,nav,footer,header,section{display: block;}
 html,body{height: 100%; min-width: 320px;}
-body{line-height: 1;font-size: 14px;font-family: Montserrat;-ms-text-size-adjust: 100%;-moz-text-size-adjust:100%;-webkit-text-size-adjust:100%;}
-input,button,textarea{font-family: Montserrat;}
+body{line-height: 1;font-size: 14px; font-family: inherit; -ms-text-size-adjust: 100%;-moz-text-size-adjust:100%;-webkit-text-size-adjust:100%;}
+input,button,textarea{font-family: inherit;}
 input::-ms-clear{display: none;}
 button{cursor: pointer;}
 button::-moz-focus-inner{padding: 0;border: 0;}
@@ -30,22 +30,23 @@ img{vertical-align: top;}
 
 .container {
     max-width: 1130px;
-    padding: 0 15px;
+    padding: 0 30px;
     margin: 0 auto;
 }
 
 .header {
     padding: 20px 0;
-    background: #DD4F43;
+    background: #23C1FF;
+    color: white;
 }
 .header h1 {
     text-align: center;
     margin: 0 auto;
-    max-width: 700px;
+    max-width: 600px;
 }
 
 .containerTodo {
-    background: #C8C8C8;
+    background: #F0F0F0;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
 }
@@ -53,7 +54,7 @@ img{vertical-align: top;}
 li {
     list-style: none;
     margin: 0.4em;
-    font-size: 20px;
+    font-size: 1em;
     padding: 5px;
 }
 li:first-child {
@@ -62,4 +63,143 @@ li:first-child {
 }
 li:last-child {
     padding-bottom: 15px;
+}
+
+#todoList ul li{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.inputContainer {
+    display: flex;
+
+}
+.inputContainer div {
+    margin-left: 10px;
+    display: flex;
+    flex-direction: column;
+}
+.plus{
+    margin: 20px 0 0 0;
+}
+.plus button{
+    width: 25px;
+    height: 25px;
+    font-size: 25px;
+    text-align: center;
+    line-height: 25px;
+    font-weight: bold;
+    border-radius: 50%;
+    border: 1px solid black;
+    background: #23C1FF;
+    color: white;
+    padding: 0;
+}
+#newTodoInput, #modalTodoInput {
+    margin: 0 0 15px 10px;
+    padding: 6px;
+    border-radius: 5px;
+    min-width: 250px;
+}
+#newTodoInput {
+    margin: 0 0 25px 0;
+}
+#modalTodoInput {
+    background: #C1C1C1;
+    min-width: 100px;
+    color: black;
+}
+.modal-modal-bodyInput-Input {
+    margin: 1.5rem 0 0 .1rem;
+}
+.modal-modal-bodyInput-Input label{
+    padding: 0 0 0 10px;
+}
+.modalTodoInput::placeholder {
+    color: white;
+    padding-left: 3px;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    padding-top: 5rem;
+}
+
+.modal-body {
+    padding: 2rem .5rem;
+    width: 450px;
+    border-radius: 5px;
+    background: #fff;
+    height: 200px;
+}
+.modal-bodyInput {
+    display: flex;
+    justify-content: space-between;
+}
+.inputDate label {
+    display: block;
+    font: 1rem 'Fira Sans', sans-serif;
+}
+.inputDate input, label {
+    max-width: 150px;
+    font-size: 12px;
+    padding: .2rem .2rem;
+}
+.inputDate {
+    position: relative;
+}
+
+.modal-modal-bodyInput-Date {
+    padding: 2rem .1rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+.modal-bodyButtons button{
+    background: #23C1FF;
+    border-radius: 10px;
+    width: 80px;
+    height: 30px;
+    margin: 0 5em;
+    color: white;
+    font-weight: bold;
+}
+
+.hide {
+    display: none;
+}
+
+.invalid {
+    border: 1px solid red;
+}
+.errDiv {
+    color: red;
+    margin: -10px 0 0 10px;
+}
+.errHide {
+    display: none;
+}
+.timeErr {
+    position: absolute;
+    top: 60px;
+    left: -10px;
+    min-width: 150px;
+}
+.modalSave {
+    opacity: 0.3;
+}
+
+.checked {
+    text-decoration: line-through;
+    color: lightgray;
+}
+.delete, .edit {
+    cursor: pointer;
 }
