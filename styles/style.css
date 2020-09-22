@@ -162,10 +162,10 @@ li:last-child {
     justify-content: space-between;
 }
 
-.modal-bodyButtons button{
+.modal-bodyButtons button, .filters span button {
     background: #23C1FF;
     border-radius: 10px;
-    width: 80px;
+    min-width: 80px;
     height: 30px;
     margin: 0 5em;
     color: white;
@@ -202,4 +202,27 @@ li:last-child {
 }
 .delete, .edit {
     cursor: pointer;
+}
+.filters {
+    display: flex;
+    justify-content: center;
+}
+.filters span {
+    margin: 0 10px 15px 10px;
+}
+.filters span button {
+    min-width: 110px;
+    margin: 0;
+    padding: 0 10px;
+    background: #23C1FF;
+    border-radius: 10px;
+    height: 25px;
+    color: white;
+    font-weight: normal;
+}
+.filters div button:first-child {
+    margin-left: 50px;
+}
+.filters div button:last-child {
+    margin-right: 50px;
 }
