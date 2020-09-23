@@ -1,9 +1,20 @@
-import  { ul, todoList } from "./constants.js";
+import {
+    ul,
+    todoList,
+    inp,
+    forbiddenSybols,
+    todayDay,
+    tomorrowDay,
+    calendarDates,
+    inpMessage,
+    inpStart, inpEnd, modal
+} from "./constants.js";
 
 
 export class TodoItem {
     done = false
     id = this.createId()
+    newTodo
 
     constructor({ message, start, end }) {
         this.message = message
@@ -19,6 +30,12 @@ export class TodoItem {
         span.style.fontWeight = 'bold'
         ul.append(li)
     }
+    runTodoMethods() {
+        this.checkTodo()
+        this.addTodo()
+        this.correctTodo()
+        this.deleteTodo()
+    }
     checkTodo() {
         todoList.addEventListener('click', function (e) {
             e.stopPropagation()
@@ -33,12 +50,66 @@ export class TodoItem {
     }
     deleteTodo() {
         todoList.addEventListener('click', function (e) {
-            e.stopPropagation()
             const target = e.target
-            const parentLi = target.closest('li')
             if (target.tagName === 'SPAN' && target.classList.contains('delete')) {
+                e.stopImmediatePropagation()
+                const parentLi = target.closest('li')
+                console.log(parentLi)
                 parentLi.remove()
             }
+        })
+    }
+    addTodo() {
+        inp.addEventListener('keyup', function (e) {
+            this.classList.remove('invalid')
+            const text = this.value
+            if (text.match(new RegExp(forbiddenSybols))) {
+                this.classList.toggle('invalid')
+                return
+            }
+
+            if (e.key === 'Enter' && text) {
+                const newTodo = { message: text, start: todayDay, end: tomorrowDay }
+                const todoLi = new TodoItem(newTodo)
+                todoLi.renderTodo()
+                inp.value = ''
+            }
+        })
+    }
+
+    correctTodoHandler(target, e) {
+        const newTodo = {done: false}
+        const parentLi = target.closest('li')
+        let message = parentLi.querySelector('.message').innerHTML
+        const dateText = parentLi.querySelector('.time').innerText
+
+        const dates = dateText.match(new  RegExp(calendarDates))
+        const start = dates[0]
+        const end = dates[1]
+
+        newTodo.start = new Date(start.split('.').reverse().join('-')).toLocaleDateString().split('.').reverse().join('-')
+        newTodo.end = new Date(end.split('.').reverse().join('-')).toLocaleDateString().split('.').reverse().join('-')
+        newTodo.message = message
+
+        if (target.tagName === 'SPAN' && target.classList.contains('edit')) {
+            e.stopImmediatePropagation()
+            modal.classList.remove('hide')
+
+            inpMessage.value = newTodo.message
+            inpStart.value = newTodo.start
+            inpEnd.value = newTodo.end
+
+            modal.dispatchEvent(new CustomEvent("correctTodo", {
+                detail: { newTodo, parentLi}
+            }))
+        }
+    }
+    correctTodo() {
+        const correctTodoHandlerBind = this.correctTodoHandler.bind(this)
+        todoList.addEventListener('click', (e) => {
+            // e.stopPropagation()
+            const target = e.target
+            correctTodoHandlerBind(target, e)
         })
     }
 

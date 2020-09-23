@@ -1,5 +1,5 @@
 import { ListComponent } from './listComponent.js'
-import { forbiddenSybols, ul, calendarDates, mockTodoList, cancelButton, inpMessage, inpStart, inpEnd, todoList  } from "./constants.js";
+import { calendarDates, inpMessage, inpStart, inpEnd  } from "./constants.js";
 import { Modal } from "./modal.js";
 
 class TodoList {
@@ -19,9 +19,9 @@ class TodoList {
     showTodoList() {
         const component = new ListComponent()
         component.render()
-        component.addTodo()
-        component.todoMethods.checkTodo()
-        component.todoMethods.deleteTodo()
+
+        const modal = new Modal()
+        modal.runModalMethods()
     }
 
     // resetModalInputs() {
@@ -61,18 +61,18 @@ class TodoList {
     //         modal.classList.remove('hide')
     //     })
     // }
-    openModal() {
-        this.modal = new Modal()
-        this.modal.openModal()
-    }
-    closeModal() {
-        this.modal.closeModal()
-    }
-    showErr() {
-        let err = document.createElement('div')
-        err.classList.add('errDiv')
-        return err
-    }
+    // openModal() {
+    //     this.modal = new Modal()
+    //     this.modal.openModal()
+    // }
+    // closeModal() {
+    //     this.modal.closeModal()
+    // }
+    // showErr() {
+    //     let err = document.createElement('div')
+    //     err.classList.add('errDiv')
+    //     return err
+    // }
     // compareDates(inpStart, inpEnd) {
     //     if (new Date(inpStart.value).getTime() > new Date(inpEnd.value).getTime()) {
     //         const errDiv = this.showErr()
@@ -204,41 +204,6 @@ class TodoList {
     //     const totalLi = document.querySelectorAll('li').length
     //     return totalLi
     // }
-
-
-
-    correctTodo() {
-        const myThis = this
-        const todoListField = document.getElementById('todoList')
-
-        todoListField.addEventListener('click', function (e) {
-            e.stopPropagation()
-            const target = e.target
-            myThis.parentLi = target.closest('li')
-            let message = myThis.parentLi.querySelector('.message').innerHTML
-            const dateText = myThis.parentLi.querySelector('.time').innerText
-
-            const dates = dateText.match(new  RegExp(calendarDates))
-            const start = dates[0]
-            const end = dates[1]
-
-            myThis.newTodo.start = new Date(start.split('.').reverse().join('-')).toLocaleDateString().split('.').reverse().join('-')
-            myThis.newTodo.end = new Date(end.split('.').reverse().join('-')).toLocaleDateString().split('.').reverse().join('-')
-            myThis.newTodo.message = message
-
-            if (target.tagName === 'SPAN' && target.classList.contains('edit')) {
-                myThis.validMessage = myThis.validDate = true
-                myThis.showSaveButton()
-                document.querySelector('.modal').classList.remove('hide')
-
-                inpMessage.value = myThis.newTodo.message
-                inpStart.value = myThis.newTodo.start
-                inpEnd.value = myThis.newTodo.end
-
-                myThis.addTodoFromModal(myThis.newTodo)
-            }
-        })
-    }
 }
 
 const myTodo = new TodoList()

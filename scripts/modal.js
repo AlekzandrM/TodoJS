@@ -1,83 +1,35 @@
-import { openButton, modal, message, start, end, totalLi, inpStart, inpEnd, cancelButton, inpMessage, todos, forbiddenSybols} from './constants.js'
+import { openButton, modal, ul, message, start, end, totalLi, inpStart, inpEnd, cancelButton, inpMessage, todos, forbiddenSybols} from './constants.js'
 import { today, tomorrow, saveButton} from "./constants.js";
 import { TodoItem } from "./todoItem.js";
 
 export class Modal {
     quantityOfTodos = this.countOfquantityOfTodo()
+    validMessage = false
+    validDate = true
+    todo = {done: false, start: today, end: tomorrow}
+
+    runModalMethods() {
+        this.openModal()
+        this.closeModal()
+        this.assignInputStart()
+        this.assignInputMessage()
+        this.assignInputEnd()
+        this.assignCancelButton()
+    }
 
     openModal() {
-        this.quantityOfTodos = this.countOfquantityOfTodo()
+        const editTodoBind = this.editTodo.bind(this)
+
         openButton.addEventListener('click', e => {
             this.resetModalInputs()
             this.addTodoFromModal()
             modal.classList.remove('hide')
         })
-    }
-    countOfquantityOfTodo() {
-        return totalLi.length
-    }
-    resetModalInputs() {
-        start.value = today
-        end.value = tomorrow
-        message.value = ''
-    }
-    addTodoFromModal(newTodo) {
-        const myThis = this
-        let start = inpStart.value.split('-').reverse().join('.')
-        let end = inpEnd.value.split('-').reverse().join('.')
-        newTodo = {start, end, done: false}
-
-        cancelButton.addEventListener('click', function (e) {
-            let quantityOfTodosAfter = myThis.countOfquantityOfTodo()
-            myThis.closeModal(quantityOfTodosAfter, )
-        })
-
-        inpMessage.addEventListener('input', function (e) {
-            myThis.validateMessage(this.value)
-            newTodo.message = this.value
-        })
-
-        inpStart.addEventListener('change', function (e) {
-            start = this.value.split('-').reverse().join('.')
-            const errParentPosition = this.parentElement
-            const el = errParentPosition.lastElementChild
-
-            const errDiv = myThis.compareDates(inpStart, inpEnd)
-            const prevErr = errParentPosition.lastElementChild.classList.contains('errDiv')
-
-            myThis.validateDate(errDiv, prevErr, el)
-            newTodo.start = start
-        })
-
-        inpEnd.addEventListener('change', function (e) {
-            const myThis = this
-            end = this.value.split('-').reverse().join('.')
-            const errParentPosition = this.parentElement.previousElementSibling
-            const el = errParentPosition.parentElement.firstElementChild.lastElementChild
-
-            let errDiv = myThis.compareDates(inpStart, inpEnd)
-            const prevErr = errParentPosition.parentElement.firstElementChild.lastElementChild.classList.contains('errDiv')
-
-            myThis.validateDate(errDiv, prevErr, el)
-            myThis.compareDates(inpStart, inpEnd)
-
-            newTodo.end = end
-        })
-        saveButton.addEventListener('click', function (e) {
-            const myThis = this
-            e.stopImmediatePropagation()
-            const todoLi = new TodoItem(newTodo)
-            const renderedTodoLi = todoLi.renderTodo()
-            const todoItemCount = document.querySelectorAll('li')
-
-            myThis.insertTodoNumber(renderedTodoLi, todoItemCount.length + 1)
-
-            const ul = document.querySelector('ul')
-            ul.append(renderedTodoLi)
-            let quantityOfTodosAfter = myThis.countOfquantityOfTodo()
-            myThis.closeModal(quantityOfTodosAfter)
-            this.validMessage = false
-            myThis.showSaveButton()
+        modal.addEventListener('correctTodo', function (e) {
+            e.stopPropagation()
+            const todo = e.detail.newTodo
+            const parentLi = e.detail.parentLi
+            editTodoBind(todo, parentLi)
         })
     }
     closeModal(quantityOfTodosAfter, parentLi) {
@@ -90,6 +42,111 @@ export class Modal {
             todosArr.map((todo, ind) => this.insertTodoNumber(todo, ind+1))
         }
     }
+    countOfquantityOfTodo() {
+        return totalLi.length
+    }
+    resetModalInputs() {
+        start.value = today
+        end.value = tomorrow
+        message.value = ''
+    }
+
+    editTodo(todo, parentLi) {
+        this.validMessage = this.validDate = true
+        this.showSaveButton()
+        this.todo = todo
+        this.addTodoFromModal(todo, parentLi)
+    }
+
+    removeParentLi(li) {
+        // Вставить проверку если колич ли меняется, удаляем
+    }
+
+    inputMessageHandler(text) {
+        this.validateMessage(text)
+        this.todo.message = text
+    }
+    assignInputMessage() {
+        const inputBind = this.inputMessageHandler.bind(this)
+        inpMessage.addEventListener('input', function (e) {
+            inputBind(this.value)
+        })
+    }
+
+    inputStartHandler(prevErr, el, start) {
+        const errDiv = this.compareDates(inpStart, inpEnd)
+
+        this.validateDate(errDiv, prevErr, el)
+        this.todo.start = start
+    }
+    assignInputStart() {
+        const assingInpStartBind = this.inputStartHandler.bind(this)
+        inpStart.addEventListener('change', function (e) {
+            const start = this.value.split('-').reverse().join('.')
+            const errParentPosition = this.parentElement
+            const el = errParentPosition.lastElementChild
+            const prevErr = errParentPosition.lastElementChild.classList.contains('errDiv')
+
+            assingInpStartBind(prevErr, el, start)
+        })
+    }
+
+    inputEndHandler(prevErr, el, end) {
+        let errDiv = this.compareDates(inpStart, inpEnd)
+
+        this.validateDate(errDiv, prevErr, el)
+        this.compareDates(inpStart, inpEnd)
+        this.todo.end = end
+    }
+    assignInputEnd() {
+        const assignInpEndBind = this.inputEndHandler.bind(this)
+        inpEnd.addEventListener('change', function (e) {
+            const end = this.value.split('-').reverse().join('.')
+            const errParentPosition = this.parentElement.previousElementSibling
+            const el = errParentPosition.parentElement.firstElementChild.lastElementChild
+
+            const prevErr = errParentPosition.parentElement.firstElementChild.lastElementChild.classList.contains('errDiv')
+
+            assignInpEndBind(prevErr, el, end)
+        })
+    }
+
+    cancelButtonHandler() {
+        let quantityOfTodosAfter = this.countOfquantityOfTodo()
+        this.closeModal(quantityOfTodosAfter)
+    }
+    assignCancelButton() {
+        const cancelBind = this.cancelButtonHandler.bind(this)
+        cancelButton.addEventListener('click', function (e) {
+            cancelBind()
+        })
+    }
+
+    saveButtonHandler(newTodo, parentLi) {
+        const todoLi = new TodoItem(newTodo)
+        todoLi.renderTodo()
+        let quantityOfTodosAfter = this.countOfquantityOfTodo()
+        this.closeModal(quantityOfTodosAfter, parentLi)
+        this.validMessage = false
+        this.showSaveButton()
+    }
+    assignSaveButton(newTodo, parentLi) {
+        const saveBind = this.saveButtonHandler.bind(this)
+        saveButton.addEventListener('click', function (e) {
+            e.stopImmediatePropagation()
+            saveBind(newTodo, parentLi)
+        })
+    }
+    addTodoFromModal(newTodo, parentLi) {
+        let start = inpStart.value.split('-').reverse().join('.')
+        let end = inpEnd.value.split('-').reverse().join('.')
+        let message = inpMessage.value
+
+        if (newTodo) this.assignSaveButton(newTodo, parentLi)
+        else this.todo = {start, end, done: false, message}
+
+    }
+
     compareDates(inpStart, inpEnd) {
         if (new Date(inpStart.value).getTime() > new Date(inpEnd.value).getTime()) {
             const errDiv = this.showErr()
@@ -148,6 +205,7 @@ export class Modal {
             this.showSaveButton()
         }
     }
+
     showSaveButton() {
         if (this.validMessage && this.validDate) {
             if (saveButton.classList.contains('modalSave')) saveButton.classList.remove('modalSave')
@@ -156,5 +214,10 @@ export class Modal {
             saveButton.classList.add('modalSave')
             saveButton.setAttribute('disabled', 'disabled')
         }
+    }
+    showErr() {
+        let err = document.createElement('div')
+        err.classList.add('errDiv')
+        return err
     }
 }
