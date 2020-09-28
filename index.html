@@ -22,14 +22,37 @@
                 </div>
 
                 <div class="inputContainer">
-                    <div>
-                        <label for="newTodoInput">To create todo:</label>
-                        <input type="text" placeholder="Enter your new Todo" id="newTodoInput">
+                    <div class="filterAndInput">
+                        <div id="filterIcon">
+                            <img src="./styles/filterSort.png" alt="">
+                        </div>
+                        <div class="createTodo">
+                            <label for="newTodoInput">To create todo:</label>
+                            <input type="text" placeholder="Enter your new Todo" id="newTodoInput">
+                        </div>
                     </div>
                     <div class="plus">
                         <button>+</button>
                     </div>
                 </div>
+
+                <div class="filterInputs hide">
+                    <div class="filterInputsBlocks filtersText">
+                        <label for="filterInput">Filter by:</label>
+                        <input type="text" placeholder="Enter filter text" id="filterInput">
+                    </div>
+                    <div class="filterInputsBlocks filtersDate">
+                        <div class="inputDate">
+                            <label for="startFilter">Start date:</label>
+                            <input type="date" id="startFilter" name="trip-start">
+                        </div>
+                        <div class="inputDate">
+                            <label for="endFilter">End date:</label>
+                            <input type="date" id="endFilter" name="trip-end">
+                        </div>
+                    </div>
+                </div>
+
                 <div class="filters">
                     <span><button id="all"> All </button></span>
                     <span><button id="active"> Active </button></span>

@@ -1,5 +1,18 @@
 import { TodoItem } from './todoItem.js'
-import {saveButton, listComponent, ul, active, all, completed, clearCompleted} from "./constants.js";
+import {
+    saveButton,
+    listComponent,
+    ul,
+    active,
+    all,
+    completed,
+    clearCompleted,
+    filters,
+    filterIcon,
+    startFilter,
+    endFilter,
+    today, tomorrow
+} from "./constants.js";
 
 let mockTodoList = [
     {id: '01', message: 'Прочитать инструкцию', start: new Date().toLocaleDateString(), end: new Date(new Date().setDate(new Date().getDate()+1)).toLocaleDateString(), done: true, btnID:'01b'},
@@ -32,6 +45,7 @@ export class ListComponent {
         this.showAllTodo()
         this.showCompletedTodo()
         this.showClearCompletedTodo()
+        this.showFilters()
     }
 
     getOldId(id) {
@@ -117,6 +131,14 @@ export class ListComponent {
     }
     showClearCompletedTodo() {
         clearCompleted.addEventListener('click', this.showClearCompletedCb)
+    }
+
+    showFilters() {
+        filterIcon.addEventListener('click', () => {
+            startFilter.value = today
+            endFilter.value = today
+            filters.classList.toggle('hide')
+        })
     }
 
     clearList() {
