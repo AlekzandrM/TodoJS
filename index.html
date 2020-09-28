@@ -17,13 +17,61 @@
 
         <main class="container">
             <div class="containerTodo">
-                <div id="todoList"></div>
+                <div id="todoList">
+                    <ul></ul>
+                </div>
+
+                <div class="inputContainer">
+                    <div>
+                        <label for="newTodoInput">To create todo:</label>
+                        <input type="text" placeholder="Enter your new Todo" id="newTodoInput">
+                    </div>
+                    <div class="plus">
+                        <button>+</button>
+                    </div>
+                </div>
+                <div class="filters">
+                    <span><button id="all"> All </button></span>
+                    <span><button id="active"> Active </button></span>
+                    <span><button id="completed"> Completed </button></span>
+                    <span><button id="clearCompleted"> Clear completed </button></span>
+                </div>
+
+            </div>
+
+            <div class="modal hide">
+                <div class="modal-body">
+                    <div class="modal-bodyInput">
+                        <div class="modal-modal-bodyInput-Input">
+                            <label for="modalTodoInput">To create todo:</label>
+                            <input type="text" placeholder="Enter your new Todo" id="modalTodoInput">
+                        </div>
+                        <div class="modal-modal-bodyInput-Date">
+                            <div class="inputDate">
+                                <label for="start">Start date:</label>
+                                <input type="date" id="start" name="trip-start"
+                                       value="2020-09-17"
+                                       min="2020-09-17" max="2020-12-31">
+                            </div>
+                            <div class="inputDate">
+                                <label for="end">End date:</label>
+                                <input type="date" id="end" name="trip-start"
+                                       value="2020-09-17"
+                                       min="2020-09-17" max="2020-12-31">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-bodyButtons">
+                        <button class="modalCancel">Cancel</button>
+                        <button class="modalSave" type="button">Save</button>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
 
 
     <footer></footer>
-    <script src="./scripts/script.js"></script>
+    <script type="module" src="scripts/script.js" ></script>
 </body>
 </html>
