@@ -11,7 +11,7 @@ import {
     filterIcon,
     startFilter,
     endFilter,
-    today, tomorrow
+    today, filterInput, firstJanuary
 } from "./constants.js";
 
 let mockTodoList = [
@@ -28,6 +28,9 @@ export class ListComponent {
     showAllCb = this.showAll.bind(this)
     showCompletedCb = this.showCompleted.bind(this)
     showClearCompletedCb = this.showClearCompleted.bind(this)
+    filterTextCb = this.filterTextMethod.bind(this)
+    filterStartCb = this.filterStartMethod.bind(this)
+    filterEndCb = this.filterEndMethod.bind(this)
 
     render(arr)  {
         arr.forEach((el) => {
@@ -46,6 +49,9 @@ export class ListComponent {
         this.showCompletedTodo()
         this.showClearCompletedTodo()
         this.showFilters()
+        this.filterByText()
+        this.filterByStartDate()
+        this.filterByEndDate()
     }
 
     getOldId(id) {
@@ -135,10 +141,49 @@ export class ListComponent {
 
     showFilters() {
         filterIcon.addEventListener('click', () => {
-            startFilter.value = today
+            startFilter.value = firstJanuary
             endFilter.value = today
             filters.classList.toggle('hide')
         })
+    }
+
+    filterTextMethod() {
+        const text = filterInput.value
+        const sortedArr = this.listTodo.filter(el => {
+            return el.message.trim().toLowerCase().indexOf(text) !== -1
+        })
+        this.clearList()
+        this.render(sortedArr)
+    }
+    filterByText() {
+        filterInput.addEventListener('input', this.filterTextCb)
+    }
+    filterStartMethod() {
+        const filterStart = new Date(startFilter.value)
+
+        const sortedArr = this.listTodo.filter(el => {
+            const todoStart = new Date(el.start.split('.').reverse().join('-'))
+            return todoStart >= filterStart
+        })
+        this.clearList()
+        this.render(sortedArr)
+    }
+    filterByStartDate() {
+        startFilter.addEventListener('input', this.filterStartCb)
+    }
+
+    filterEndMethod() {
+        const filterEnd = new Date(endFilter.value)
+
+        const sortedArr = this.listTodo.filter(el => {
+            const todoEnd = new Date(el.end.split('.').reverse().join('-'))
+            return todoEnd <= filterEnd
+        })
+        this.clearList()
+        this.render(sortedArr)
+    }
+    filterByEndDate() {
+        endFilter.addEventListener('input', this.filterEndCb)
     }
 
     clearList() {

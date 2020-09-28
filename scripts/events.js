@@ -62,4 +62,3 @@ export class Events {
         })
     }
 }
-// Всем привет. Ребята, подскажите плз, в первом проекте кнопки All, Active, Completed, Clear как
