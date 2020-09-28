@@ -9,9 +9,9 @@ import {
 
 export class Events {
     runTodoMethods() {
-        this.checkTodo()
         this.addTodo()
         this.deleteTodo()
+        this.checkTodo()
     }
 
     checkTodo() {
@@ -21,10 +21,7 @@ export class Events {
             const parentTodo = input.parentElement.parentElement
 
             if (input.tagName !== 'INPUT') return
-            if (input.checked) {
-                e.stopImmediatePropagation()
-                parentTodo.classList.add('checked')
-            } else parentTodo.classList.remove('checked')
+            input.checked ? parentTodo.classList.add('checked') : parentTodo.classList.remove('checked')
         })
     }
     deleteTodo() {
@@ -65,3 +62,4 @@ export class Events {
         })
     }
 }
+// Всем привет. Ребята, подскажите плз, в первом проекте кнопки All, Active, Completed, Clear как

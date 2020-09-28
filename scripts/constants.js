@@ -28,6 +28,10 @@ export const message = document.querySelector('#modalTodoInput')
 export const start = document.querySelector('#start')
 export const end = document.querySelector('#end')
 
+export const active = document.getElementById('active')
+export const all = document.getElementById('all')
+export const completed = document.getElementById('completed')
+export const clearCompleted = document.getElementById('clearCompleted')
 
 export const listComponent = new ListComponent()
 export const modalTodo = new Modal()

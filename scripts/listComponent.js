@@ -1,23 +1,37 @@
 import { TodoItem } from './todoItem.js'
-import { saveButton,listComponent, ul } from "./constants.js";
+import {saveButton, listComponent, ul, active, all, completed, clearCompleted} from "./constants.js";
 
 let mockTodoList = [
-    // {id: '01', message: 'Прочитать инструкцию', start: new Date().toLocaleDateString(), end: new Date(new Date().setDate(new Date().getDate()+1)).toLocaleDateString(), done: false, btnID:'01b'},
-    // {id: '02', message: 'Создать тудушку', start: new Date().toLocaleDateString(), end: new Date(new Date().setDate(new Date().getDate()+1)).toLocaleDateString(), done: false, btnID:'02b'},
-    // {id: '03', message: 'Добавить функционал', start: new Date().toLocaleDateString(), end: new Date(new Date().setDate(new Date().getDate()+1)).toLocaleDateString(), done: false, btnID:'03b'},
+    {id: '01', message: 'Прочитать инструкцию', start: new Date().toLocaleDateString(), end: new Date(new Date().setDate(new Date().getDate()+1)).toLocaleDateString(), done: true, btnID:'01b'},
+    {id: '02', message: 'Создать тудушку', start: new Date().toLocaleDateString(), end: new Date(new Date().setDate(new Date().getDate()+1)).toLocaleDateString(), done: false, btnID:'02b'},
+    {id: '03', message: 'Добавить функционал', start: new Date().toLocaleDateString(), end: new Date(new Date().setDate(new Date().getDate()+1)).toLocaleDateString(), done: true, btnID:'03b'},
 ]
 
 export class ListComponent {
     listTodo = mockTodoList
     oldIdBTnID
 
-    render()  {
-        this.listTodo.forEach((el) => {
+    showActiveCb = this.showActive.bind(this)
+    showAllCb = this.showAll.bind(this)
+    showCompletedCb = this.showCompleted.bind(this)
+    showClearCompletedCb = this.showClearCompleted.bind(this)
+
+    render(arr)  {
+        arr.forEach((el) => {
             const todo = new TodoItem(el)
             todo.renderTodo()
 
             this.removeEventHandlers()
         })
+    }
+    runListComponentMethods() {
+        this.render(this.listTodo)
+        this.editionTodo()
+        this.addTodoFromMain()
+        this.showActiveTodo()
+        this.showAllTodo()
+        this.showCompletedTodo()
+        this.showClearCompletedTodo()
     }
 
     getOldId(id) {
@@ -35,7 +49,7 @@ export class ListComponent {
         this.listTodo = [...newList]
 
         this.clearList()
-        listComponent.render()
+        listComponent.render(this.listTodo)
     }
     editionTodo() {
         const editBind = this.editTodoHandler.bind(this)
@@ -56,7 +70,7 @@ export class ListComponent {
 
         this.clearList()
         this.listTodo = [...this.listTodo, listTodoItem]
-        listComponent.render()
+        listComponent.render(this.listTodo)
     }
     addTodoFromMain() {
         const addTodoBind = this.addTodoMainHandler.bind(this)
@@ -64,6 +78,45 @@ export class ListComponent {
             const todo = e.detail.newTodo
             addTodoBind(todo)
         })
+    }
+
+    showAll() {
+        this.clearList()
+        listComponent.render(this.listTodo)
+    }
+    showAllTodo() {
+        all.addEventListener('click', this.showAllCb)
+    }
+    showActive() {
+        const acitveTodos =  this.listTodo.filter((el, ind) => {
+            return el.done === true
+        })
+        this.clearList()
+        listComponent.render(acitveTodos)
+    }
+    showActiveTodo() {
+        active.addEventListener('click', this.showActiveCb)
+    }
+    showCompleted() {
+        const completedTodos =  this.listTodo.filter((el, ind) => {
+            return el.done !== true
+        })
+        this.clearList()
+        listComponent.render(completedTodos)
+    }
+    showCompletedTodo() {
+        completed.addEventListener('click', this.showCompletedCb)
+    }
+    showClearCompleted() {
+        const completedTodos =  this.listTodo.filter((el, ind) => {
+            return el.done !== true
+        })
+        this.listTodo = [...completedTodos]
+        this.clearList()
+        listComponent.render(this.listTodo)
+    }
+    showClearCompletedTodo() {
+        clearCompleted.addEventListener('click', this.showClearCompletedCb)
     }
 
     clearList() {
