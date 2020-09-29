@@ -72,10 +72,28 @@ li:last-child {
 }
 .inputContainer {
     display: flex;
-
 }
-.inputContainer div {
+.filterAndInput {
+    display: flex;
+}
+#filterIcon {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    padding-top: 15px;
+}
+#filterIcon > img {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.inputContainer {
     margin-left: 10px;
+    display: flex;
+    flex-direction: row;
+}
+.createTodo {
     display: flex;
     flex-direction: column;
 }
@@ -94,16 +112,28 @@ li:last-child {
     background: #23C1FF;
     color: white;
     padding: 0;
+    margin-left: 10px;
 }
-#newTodoInput, #modalTodoInput {
+#newTodoInput, #modalTodoInput, #filterInput {
     margin: 0 0 15px 10px;
     padding: 6px;
     border-radius: 5px;
     min-width: 250px;
 }
-#newTodoInput {
-    margin: 0 0 25px 0;
+#newTodoInput, #filterInput {
+    margin: 0 0 5px 0;
 }
+
+.filterInputs {
+    margin: 0 5px 5px 10px;
+}
+.filterInputsBlocks {
+    margin: 5px 10px 0 0;
+}
+.filtersDate {
+    display: flex;
+}
+
 #modalTodoInput {
     background: #C1C1C1;
     min-width: 100px;
@@ -112,7 +142,7 @@ li:last-child {
 .modal-modal-bodyInput-Input {
     margin: 1.5rem 0 0 .1rem;
 }
-.modal-modal-bodyInput-Input label{
+.modal-modal-bodyInput-Input label {
     padding: 0 0 0 10px;
 }
 .modalTodoInput::placeholder {
@@ -156,10 +186,17 @@ li:last-child {
     position: relative;
 }
 
-.modal-modal-bodyInput-Date {
+.modal-modal-bodyInput-Date, .filtersDate {
     padding: 2rem .1rem;
     display: flex;
     justify-content: space-between;
+}
+.filtersDate {
+    padding: 0.5rem .1rem;
+    justify-content: flex-start;
+}
+.inputDate {
+    margin-right: 15px;
 }
 
 .modal-bodyButtons button, .filters span button {
