@@ -4,9 +4,9 @@ import { Modal } from "./modal.js";
 export const forbiddenSybols = '^(?=.*[!@#$%^&(),.+=/\\]\\[{}?><":;|])'
 export const calendarDates = /\b\d\d.\d\d.\d\d\d\d/g
 
-export const today = new Date().toLocaleDateString().split('.').reverse().join('-')
-export const tomorrow = new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleDateString().split('.').reverse().join('-')
-export const firstJanuary = new Date(2020, 0, 1).toLocaleDateString().split('.').reverse().join('-')
+export const today = formatDay(new Date())
+export const tomorrow = formatDay(new Date(new Date().setDate(new Date().getDate() + 1)))
+export const firstJanuary = formatDay(new Date(2020, 0, 1))
 
 export const saveButton = document.querySelector('.modalSave')
 export const cancelButton = document.querySelector('.modalCancel')
@@ -42,3 +42,7 @@ export const filterInput = document.getElementById('filterInput')
 
 export const listComponent = new ListComponent()
 export const modalTodo = new Modal()
+
+function formatDay(date) {
+    return date.toLocaleDateString().split('.').reverse().join('-')
+}

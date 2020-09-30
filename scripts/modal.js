@@ -2,12 +2,18 @@ import { openButton, modal, message, start, end, inpStart, inpEnd, cancelButton,
 
 
 export class Modal {
+
     validMessage = false
     validDate = true
     todo = {done: false, id: (new Date().getTime()).toString()}
 
     addTodoFromModalCb = this.addTodoFromModalHandler.bind(this)
     openModalCb = this.openModalHandler.bind(this)
+    openModalEditButtonCb = this.openModalEditHandler.bind(this)
+    assignInputMessageCb = this.inputMessageHandler.bind(this)
+    assignInputStartCb = this.inputStartHandler.bind(this)
+    assignInputEndCb = this.inputEndHandler.bind(this)
+    assignCancelButtonCb = this.cancelButtonHandler.bind(this)
 
     runModalMethods() {
         this.openModalEditButton()
@@ -16,6 +22,7 @@ export class Modal {
         this.assignInputMessage()
         this.assignInputEnd()
         this.assignCancelButton()
+        this.removeEventHandlers()
     }
 
     openModalHandler() {
@@ -23,22 +30,22 @@ export class Modal {
         this.addTodoFromModal()
         modal.classList.remove('hide')
     }
+
     openModalAddButton() {
         openButton.addEventListener('click', this.openModalCb)
     }
-    openModalEditHandler(editTodo) {
+
+    openModalEditHandler(e) {
+        e.stopPropagation()
         this.validMessage = this.validDate = true
         this.showSaveButton()
-        this.addTodoFromModal(editTodo)
+        this.addTodoFromModal(e.detail.currentTodo)
     }
+
     openModalEditButton() {
-        const editTodoBind = this.openModalEditHandler.bind(this)
-        document.addEventListener('currentTodoEvent', function (e) {
-            e.stopPropagation()
-            const editTodo = e.detail.currentTodo
-            editTodoBind(editTodo)
-        })
+        document.addEventListener('currentTodoEvent', e => this.openModalEditButtonCb(e))
     }
+
     resetModalInputs() {
         start.value = today
         end.value = tomorrow
@@ -51,107 +58,106 @@ export class Modal {
         this.todo.btnID = `${this.todo.message}${this.todo.start}${this.todo.end}`
         return this.todo
     }
+
     assignInputMessage() {
-        const inputBind = this.inputMessageHandler.bind(this)
-        inpMessage.addEventListener('input', function (e) {
-            inputBind(this.value)
-        })
+        inpMessage.addEventListener('input', () => this.assignInputMessageCb(inpMessage.value))
     }
 
-    inputStartHandler(prevErr, el, start) {
+    inputStartHandler() {
+        const start = this.formattingDate(inpStart.value)
+        const errParentPosition = inpStart.parentElement
+        const el = errParentPosition.lastElementChild
+        const prevErr = errParentPosition.lastElementChild.classList.contains('errDiv')
         const errDiv = this.compareDates(inpStart, inpEnd)
 
         this.validateDate(errDiv, prevErr, el)
         this.todo.start = start
         this.todo.btnID = `${this.todo.message}${this.todo.start}${this.todo.end}`
     }
-    assignInputStart() {
-        const assingInpStartBind = this.inputStartHandler.bind(this)
-        inpStart.addEventListener('change', function (e) {
-            const start = this.value.split('-').reverse().join('.')
-            const errParentPosition = this.parentElement
-            const el = errParentPosition.lastElementChild
-            const prevErr = errParentPosition.lastElementChild.classList.contains('errDiv')
 
-            assingInpStartBind(prevErr, el, start)
-        })
+    assignInputStart() {
+        inpStart.addEventListener('change', this.assignInputStartCb)
     }
 
-    inputEndHandler(prevErr, el, end) {
-        let errDiv = this.compareDates(inpStart, inpEnd)
+    inputEndHandler() {
+        const end = this.formattingDate(inpEnd.value)
+        const errParentPosition = inpEnd.parentElement.previousElementSibling
+        const el = errParentPosition.parentElement.firstElementChild.lastElementChild
+        const prevErr = errParentPosition.parentElement.firstElementChild.lastElementChild.classList.contains('errDiv')
+        const errDiv = this.compareDates(inpStart, inpEnd)
 
         this.validateDate(errDiv, prevErr, el)
         this.compareDates(inpStart, inpEnd)
         this.todo.end = end
         this.todo.btnID = `${this.todo.message}${this.todo.start}${this.todo.end}`
     }
-    assignInputEnd() {
-        const assignInpEndBind = this.inputEndHandler.bind(this)
-        inpEnd.addEventListener('change', function (e) {
-            const end = this.value.split('-').reverse().join('.')
-            const errParentPosition = this.parentElement.previousElementSibling
-            const el = errParentPosition.parentElement.firstElementChild.lastElementChild
-            const prevErr = errParentPosition.parentElement.firstElementChild.lastElementChild.classList.contains('errDiv')
 
-            assignInpEndBind(prevErr, el, end)
-        })
+    assignInputEnd() {
+        inpEnd.addEventListener('change', this.assignInputEndCb)
     }
 
     cancelButtonHandler() {
         this.resetModalInputs()
         modal.classList.add('hide')
     }
+
     assignCancelButton() {
-        const cancelBind = this.cancelButtonHandler.bind(this)
-        cancelButton.addEventListener('click', function (e) {
-            cancelBind()
-        })
+        cancelButton.addEventListener('click', this.assignCancelButtonCb)
     }
 
     addTodoFromModalHandler() {
-        let start = inpStart.value.split('-').reverse().join('.')
-        let end = inpEnd.value.split('-').reverse().join('.')
+        const start = this.formattingDate(inpStart.value)
+        const end = this.formattingDate(inpEnd.value)
+
         this.todo.start = start
         this.todo.end = end
         this.todo.btnID = `${this.todo.message}${start}${end}`
-
         saveButton.dispatchEvent(new CustomEvent('saveEditTodoEvent', {
             detail: { editTodo: this.todo }
         }))
         this.resetModalInputs()
         modal.classList.add('hide')
     }
+
     addTodoFromModal(editTodo) {
-        if (editTodo)  {
-            modal.classList.remove('hide')
-            inpMessage.value = editTodo.message
-            inpStart.value = new Date(editTodo.start.split('.').reverse().join('-')).toLocaleDateString().split('.').reverse().join('-')
-            inpEnd.value = new Date(editTodo.end.split('.').reverse().join('-')).toLocaleDateString().split('.').reverse().join('-')
-            this.todo.message = editTodo.message
-            this.todo.start = editTodo.start
-            this.todo.end = editTodo.end
-            this.todo.btnID = editTodo.btnID
-        }
+        if (editTodo) this.exposeTodoInModal(editTodo)
         this.showSaveButton()
         saveButton.addEventListener('click', this.addTodoFromModalCb)
     }
 
+    exposeTodoInModal(todo = {}) {
+        const { message, start, end, btnID } = todo
+
+        modal.classList.remove('hide')
+        inpMessage.value = message
+        inpStart.value = this.formattingDateForModal(new Date(this.formattingDateForModal(start)).toLocaleDateString())
+        inpEnd.value = this.formattingDateForModal(new Date(this.formattingDateForModal(end)).toLocaleDateString())
+        this.todo.message = message
+        this.todo.start = start
+        this.todo.end = end
+        this.todo.btnID = btnID
+    }
+
     compareDates(inpStart, inpEnd) {
-        if (new Date(inpStart.value).getTime() > new Date(inpEnd.value).getTime()) {
+        const dataError = new Date(inpStart.value).getTime() > new Date(inpEnd.value).getTime()
+
+        if (dataError) {
             const errDiv = this.showErr()
             errDiv.innerHTML = 'Wrong time intervals'
             errDiv.classList.add('timeErr')
             return errDiv
         }
     }
+
     validateMessage(text) {
         const invalidInput = new RegExp(forbiddenSybols).test(text)
+        const errorInput = invalidInput || !text
+        const correctInput = !invalidInput && text
 
-        if (invalidInput || !text) {
+        if (errorInput) {
             inpMessage.classList.add('invalid')
             const errDiv = this.showErr()
             errDiv.innerHTML = 'Wrong symbol or empty field'
-
             if (inpMessage.nextElementSibling === null) inpMessage.after(errDiv)
             this.validMessage = false
             this.showSaveButton()
@@ -160,7 +166,7 @@ export class Modal {
             this.validMessage = false
             this.showSaveButton()
         }
-        if (!invalidInput && text) {
+        if (correctInput) {
             let errDiv = inpMessage.nextElementSibling
             if (errDiv) errDiv.remove()
             inpMessage.classList.remove('invalid')
@@ -168,35 +174,38 @@ export class Modal {
             this.showSaveButton()
         }
     }
+
     validateDate(errDiv, prevErr, el) {
         const errParentPosition = el.parentElement
+        const newErrorOrOldError = errDiv || prevErr
+        const newErrorAndOldError = errDiv && prevErr
+        const newErrorAndNoPreviousError = errDiv && !prevErr
+        const validDate = !errDiv && !prevErr
 
-        if (errDiv || prevErr) {
+        if (newErrorOrOldError) {
             this.validDate = false
             this.showSaveButton()
         }
-        if (errDiv && prevErr) {
-            return this.showSaveButton()
-        }
-        if (errDiv && !prevErr) {
-            errParentPosition.append(errDiv)
-        }
+        if (newErrorAndOldError) this.showSaveButton()
+        if (newErrorAndNoPreviousError) errParentPosition.append(errDiv)
         if (prevErr) {
             errParentPosition.lastChild.remove()
             this.validDate = (new Date(inpStart.value).getTime() < new Date(inpEnd.value).getTime())
             this.showSaveButton()
         }
-        if (!errDiv && !prevErr) {
+        if (validDate) {
             let errDiv = el.parentElement.lastElementChild
-            if (errDiv.classList.contains('errDiv')) errDiv.remove()
 
+            if (errDiv.classList.contains('errDiv')) errDiv.remove()
             this.validDate = true
             this.showSaveButton()
         }
     }
 
     showSaveButton() {
-        if (this.validMessage && this.validDate) {
+        const isVisibleButton = this.validMessage && this.validDate
+
+        if (isVisibleButton) {
             if (saveButton.classList.contains('modalSave')) saveButton.classList.remove('modalSave')
             saveButton.removeAttribute('disabled')
         } else {
@@ -204,9 +213,27 @@ export class Modal {
             saveButton.setAttribute('disabled', 'disabled')
         }
     }
+
     showErr() {
-        let err = document.createElement('div')
+        const err = document.createElement('div')
+
         err.classList.add('errDiv')
         return err
+    }
+
+    formattingDate(date) {
+        return date.split('-').reverse().join('.')
+    }
+
+    formattingDateForModal(date) {
+        return date.split('.').reverse().join('-')
+    }
+
+    removeEventHandlers() {
+        document.removeEventListener('currentTodoEvent', e => this.openModalEditButtonCb(e))
+        inpMessage.removeEventListener('input', () => this.assignInputMessageCb(inpMessage.value))
+        inpStart.removeEventListener('change', this.assignInputStartCb)
+        inpEnd.removeEventListener('change', this.assignInputEndCb)
+        cancelButton.removeEventListener('click', this.assignCancelButtonCb)
     }
 }

@@ -4,11 +4,11 @@ import { listComponent, modalTodo } from "./constants.js";
 
 class TodoList {
     showTodoList() {
+        const events = new Events()
+
+        events.runTodoMethods()
         listComponent.runListComponentMethods()
         modalTodo.runModalMethods()
-
-        const events = new Events()
-        events.runTodoMethods()
     }
 }
 

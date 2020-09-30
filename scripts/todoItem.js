@@ -13,6 +13,7 @@ export class TodoItem {
         this.start = start
         this.end = end
     }
+
     renderTodo() {
         const li = document.createElement('li')
         li.innerHTML = `
@@ -23,19 +24,24 @@ export class TodoItem {
         ul.append(li)
         this.todoSetupHandlers()
     }
+
     createId() {
         return `f${(~~(Math.random()*1e8)).toString(16)}`
     }
+
     sendToModal() {
         const btnID = `${this.message}${this.start}${this.end}`
         const currentTodo = {id: this.id, start: this.start, end: this.end, done: this.done, message: this.message, btnID }
+
         document.dispatchEvent(new CustomEvent("currentTodoEvent", {
             detail: { currentTodo, btnID }
         }))
     }
+
     getEditIcon() {
         return document.getElementById(`${this.message}${this.start}${this.end}`)
     }
+
     todoSetupHandlers() {
         this.getEditIcon().addEventListener('click', this.editModalCb)
         this.getDeleteIcon().addEventListener('click', this.removeCb)
@@ -44,6 +50,7 @@ export class TodoItem {
     getDeleteIcon() {
         return document.querySelector('.delete')
     }
+
     removeEventHandlers() {
         this.getEditIcon().removeEventListener('click', this.editModalCb)
         this.getDeleteIcon().removeEventListener('click', this.removeCb)

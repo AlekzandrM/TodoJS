@@ -8,6 +8,9 @@ import {
 
 
 export class Events {
+
+    deleteCb = this.deleteTodoHandler.bind(this)
+
     runTodoMethods() {
         this.addTodo()
         this.deleteTodo()
@@ -24,41 +27,53 @@ export class Events {
             input.checked ? parentTodo.classList.add('checked') : parentTodo.classList.remove('checked')
         })
     }
-    deleteTodo() {
-        todoList.addEventListener('click', function (e) {
-            e.stopPropagation()
-            const target = e.target
-            if (target.tagName === 'SPAN' && target.classList.contains('delete')) {
-                e.stopPropagation()
-                const parentLi = target.closest('li')
-                parentLi.remove()
-            }
-        })
+
+    deleteTodoHandler(e) {
+        const target = e.target
+        const isIncorrectButton = target.tagName !== 'SPAN' || !target.classList.contains('delete')
+
+        if (isIncorrectButton) return
+        target.closest('li').remove()
     }
+
+    deleteTodo() {
+        todoList.addEventListener('click', (e) => this.deleteCb(e))
+    }
+
+    validateText(text) {
+        return text.match(new RegExp(forbiddenSybols))
+    }
+
+    addTodoHandler(e, text) {
+        const isIncorrectData = e.key !== 'Enter' || !text
+
+        if (isIncorrectData) return
+        const newTodo = {
+            message: text,
+            start: todayDay,
+            end: tomorrowDay,
+            id: (new Date().getTime()).toString(),
+            done: false,
+            btnID: `${text}${todayDay}${tomorrowDay}`
+        }
+        document.dispatchEvent(new CustomEvent('addTodoFromMainInp', {
+            detail: { newTodo }
+        }))
+        inp.value = ''
+    }
+
     addTodo() {
+        const validTextBind = this.validateText.bind(this)
+        const addHandlerBind = this.addTodoHandler.bind(this)
+
         inp.addEventListener('keyup', function (e) {
             e.stopPropagation()
             this.classList.remove('invalid')
-            const text = this.value
-            if (text.match(new RegExp(forbiddenSybols))) {
-                this.classList.toggle('invalid')
-                return
+            if (validTextBind(this.value)) {
+                inp.classList.toggle('invalid')
+                return;
             }
-            if (e.key === 'Enter' && text) {
-                const newTodo = {
-                    message: text,
-                    start: todayDay,
-                    end: tomorrowDay,
-                    id: (new Date().getTime()).toString(),
-                    done: false,
-                    btnID: `${text}${todayDay}${tomorrowDay}`
-                }
-
-                document.dispatchEvent(new CustomEvent('addTodoFromMainInp', {
-                    detail: { newTodo }
-                }))
-                inp.value = ''
-            }
+            addHandlerBind(e, this.value)
         })
     }
 }
